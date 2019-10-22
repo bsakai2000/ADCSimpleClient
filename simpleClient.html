@@ -1,0 +1,159 @@
+<html>
+	<head>
+		<script>
+			var server = "http://192.168.56.107/api/";
+			//var server = "https://rpiadc.com/api/";
+
+			function postRequest(requestURI)
+			{
+				var request = new XMLHttpRequest();
+				request.onload = function ()
+				{
+					document.getElementById('responseCode').innerHTML = request.status;
+					document.getElementById('response').value = request.responseText;
+					if(requestURI.indexOf("login") != -1)
+						document.getElementById('authentication').value = JSON.parse(request.responseText).SESSIONID;
+				}
+				request.open("POST", server + requestURI, false);
+				request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+				request.setRequestHeader("Authorization", "Bearer " + document.getElementById('authentication').value);
+				var postData = {};
+				postData.RCSid = document.getElementById('RCSid').value;
+				postData.username = document.getElementById('username').value;
+				postData.password = document.getElementById('password').value;
+				postData.newPassword = document.getElementById('newPassword').value;
+				postData.door = document.getElementById('door').value;
+				postData.Location = document.getElementById('Location').value;
+				postData.Message = document.getElementById('Message').value;
+				request.send(JSON.stringify(postData));
+			}
+
+			function getRequest(requestURI)
+			{
+				var request = new XMLHttpRequest();
+				request.onload = function ()
+				{
+					document.getElementById('responseCode').innerHTML= request.status;
+					document.getElementById('response').value = request.responseText;
+					if(requestURI == 'renew-token')
+						document.getElementById('authentication').value = JSON.parse(request.responseText).SESSIONID;
+				}
+				request.open("GET", server + requestURI, false);
+				request.setRequestHeader("Authorization", "Bearer " + document.getElementById('authentication').value);
+				request.send();
+			}
+		</script>
+		<style>
+			textarea
+			{
+				width: 100%;
+				height: 200px;
+			}
+			td.apiCall
+			{
+				cursor: pointer;
+			}
+		</style>
+	</head>
+	<body>
+		<h1>Simple ADC Client</h1>
+		Almost the simplest ADC client possible<br>
+		For POST requests, fill the Fields in the first table with the Values you want to send, then click the name of the desired POST request in the second table<br>
+		For GET requests, simply click the name of the desired GET request in the second table<br>
+		The HTTP Status Code and Server Response for your request will appear in the third table<br>
+		If the request returns a SESSIONID, the SESSIONID returned by the server will appear in the third table<br>
+		All requests have the Authorization header set using the Authentication Token field from the third table<br><br>
+		<table border='1'>
+			<tr>
+				<td><b>Field</b></td>
+				<td><b>Value</b></td>
+				<tr>
+					<td>RCSid</td>
+					<td><input id="RCSid" placeholder="RCSid"/></td>
+				</tr>
+				<tr>
+					<td>username</td>
+					<td><input id="username" placeholder="username"/></td>
+				</tr>
+				<tr>
+					<td>password</td>
+					<td><input id="password" placeholder="password"/></td>
+				</tr>
+				<tr>
+					<td>newPassword</td>
+					<td><input id="newPassword" placeholder="newPassword"/></td>
+				</tr>
+				<tr>
+					<td>door</td>
+					<td><input id="door" placeholder="door"/></td>
+				</tr>
+				<tr>
+					<td>Location</td>
+					<td><input id="Location" placeholder="Location"/></td>
+				</tr>
+				<tr>
+					<td>Message</td>
+					<td><input id="Message" placeholder="Message"/></td>
+				</tr>
+		</table><br>
+		<table border='1'>
+			<tr>
+				<td><b>GET Requests</b></td>
+				<td><b>POST Requests</b></td>
+			</tr>
+			<tr>
+				<td onclick="getRequest('active_user')" class="apiCall">active_user</td>
+				<td onclick="postRequest('login')" class="apiCall">login</td>
+			</tr>
+			<tr>
+				<td onclick="getRequest('inactive_user')" class="apiCall">inactive_user</td>
+				<td onclick="postRequest('admin/login')" class="apiCall">admin/login</td>
+			</tr>
+			<tr>
+				<td onclick="getRequest('addAll')" class="apiCall">addAll</td>
+				<td onclick="postRequest('request-access')" class="apiCall">request-access</td>
+			</tr>
+			<tr>
+				<td onclick="getRequest('get-complaints')" class="apiCall">get-complaints</td>
+				<td onclick="postRequest('addtoActive')" class="apiCall">addtoActive</td>
+			</tr>
+			<tr>
+				<td onclick="getRequest('get-doors')" class="apiCall">get-doors</td>
+				<td onclick="postRequest('remove')" class="apiCall">remove</td>
+			</tr>
+			<tr>
+				<td onclick="getRequest('renew-token')" class="apiCall">renew-token</td>
+				<td onclick="postRequest('submit-complaint')" class="apiCall">submit-complaint</td>
+			</tr>
+			<tr>
+				<td></td>
+				<td onclick="postRequest('open-door')" class="apiCall">open-door</td>
+			</tr>
+			<tr>
+				<td></td>
+				<td onclick="postRequest('change-password')" class="apiCall">change-password</td>
+			</tr>
+			<tr>
+				<td></td>
+				<td onclick="postRequest('admin/change-password')" class="apiCall">admin/change-password</td>
+			</tr>
+			<tr>
+				<td></td>
+				<td onclick="postRequest('reset-password')" class="apiCall">reset-password</td>
+			</tr>
+		</table><br>
+		<table border='1' style="width:100%">
+			<tr>
+				<td style="width:10%"><b>HTTP Status Code</b></td>
+				<td><b>Server Response</b></td>
+				<td><b>Authentication Token</b></td>
+			</tr>
+			<tr>
+				<td id="responseCode"></td>
+				<td><textarea id="response"></textarea></td>
+				<td><textarea id="authentication"></textarea></td>
+			</tr>
+		</table>
+		<div id='token'></div>
+	</body>
+</html>
