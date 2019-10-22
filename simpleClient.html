@@ -1,22 +1,29 @@
 <html>
 	<head>
 		<script>
-			var server = "http://192.168.56.107/api/";
-			//var server = "https://rpiadc.com/api/";
+			//Server we're making requests to
+			//var server = "http://192.168.56.107/api/";
+			var server = "https://rpiadc.com/api/";
 
+			//Make a POST request to the server
 			function postRequest(requestURI)
 			{
 				var request = new XMLHttpRequest();
 				request.onload = function ()
 				{
+					//Populate the third table with information about the request
 					document.getElementById('responseCode').innerHTML = request.status;
 					document.getElementById('response').value = request.responseText;
+					//If we made a request to admin/login or login, store the JWT we got back
 					if(requestURI.indexOf("login") != -1)
 						document.getElementById('authentication').value = JSON.parse(request.responseText).SESSIONID;
 				}
+				//Generate the request
 				request.open("POST", server + requestURI, false);
 				request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+				//Set an Authorization header containing the JWT in the Authorization Token portion of the last table
 				request.setRequestHeader("Authorization", "Bearer " + document.getElementById('authentication').value);
+				//Send all the values of the user input fields as a JSON object
 				var postData = {};
 				postData.RCSid = document.getElementById('RCSid').value;
 				postData.username = document.getElementById('username').value;
@@ -28,17 +35,22 @@
 				request.send(JSON.stringify(postData));
 			}
 
+			//Make a GET request to the server
 			function getRequest(requestURI)
 			{
 				var request = new XMLHttpRequest();
 				request.onload = function ()
 				{
+					//Populate the third table with information about the request
 					document.getElementById('responseCode').innerHTML= request.status;
 					document.getElementById('response').value = request.responseText;
+					//If we made a request to renew-token, store the JWT we got back
 					if(requestURI == 'renew-token')
 						document.getElementById('authentication').value = JSON.parse(request.responseText).SESSIONID;
 				}
+				//Generate the request
 				request.open("GET", server + requestURI, false);
+				//Set an Authorization header containing the JWT in the Authorization Token portion of the last table
 				request.setRequestHeader("Authorization", "Bearer " + document.getElementById('authentication').value);
 				request.send();
 			}
@@ -63,6 +75,7 @@
 		The HTTP Status Code and Server Response for your request will appear in the third table<br>
 		If the request returns a SESSIONID, the SESSIONID returned by the server will appear in the third table<br>
 		All requests have the Authorization header set using the Authentication Token field from the third table<br><br>
+		<!-- This table stores the Fields we can send to the API, with inputs for users to fill in their own values -->
 		<table border='1'>
 			<tr>
 				<td><b>Field</b></td>
@@ -96,6 +109,7 @@
 					<td><input id="Message" placeholder="Message"/></td>
 				</tr>
 		</table><br>
+		<!-- This table stores clickable cells that make the requests, sorted by column depending on the type of request (GET or POST) -->
 		<table border='1'>
 			<tr>
 				<td><b>GET Requests</b></td>
@@ -142,6 +156,7 @@
 				<td onclick="postRequest('reset-password')" class="apiCall">reset-password</td>
 			</tr>
 		</table><br>
+		<!-- This table stores information about the request, as well as the JWT authentication token currently in use -->
 		<table border='1' style="width:100%">
 			<tr>
 				<td style="width:10%"><b>HTTP Status Code</b></td>
@@ -154,6 +169,5 @@
 				<td><textarea id="authentication"></textarea></td>
 			</tr>
 		</table>
-		<div id='token'></div>
 	</body>
 </html>
