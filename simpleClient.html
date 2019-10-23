@@ -16,7 +16,10 @@
 					document.getElementById('response').value = request.responseText;
 					//If we made a request to admin/login or login, store the JWT we got back
 					if(requestURI.indexOf("login") != -1)
+					{
 						document.getElementById('authentication').value = JSON.parse(request.responseText).SESSIONID;
+						decodeToken();
+					}
 				}
 				//Generate the request
 				request.open("POST", server + requestURI, false);
@@ -46,13 +49,23 @@
 					document.getElementById('response').value = request.responseText;
 					//If we made a request to renew-token, store the JWT we got back
 					if(requestURI == 'renew-token')
+					{
 						document.getElementById('authentication').value = JSON.parse(request.responseText).SESSIONID;
+						decodeToken();
+					}
 				}
 				//Generate the request
 				request.open("GET", server + requestURI, false);
 				//Set an Authorization header containing the JWT in the Authorization Token portion of the last table
 				request.setRequestHeader("Authorization", "Bearer " + document.getElementById('authentication').value);
 				request.send();
+			}
+
+			function decodeToken()
+			{
+				let token = document.getElementById('authentication').value.split('.');
+				let tokenDecoded = atob(token[0]) + " " + atob(token[1]);
+				document.getElementById("decodedToken").innerHTML = tokenDecoded;
 			}
 		</script>
 		<style>
@@ -169,5 +182,6 @@
 				<td><textarea id="authentication"></textarea></td>
 			</tr>
 		</table>
+		Decoded token: <span id="decodedToken"></span>
 	</body>
 </html>
