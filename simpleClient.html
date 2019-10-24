@@ -64,7 +64,10 @@
 
 			function decodeToken()
 			{
-				let token = document.getElementById('authentication').value.split('.');
+				let token = document.getElementById('authentication').value;
+				if(token == "")
+					return;
+				token = token.split('.');
 				let tokenDecoded = atob(token[0]) + " " + atob(token[1]);
 				document.getElementById("decodedToken").innerHTML = tokenDecoded;
 			}
