@@ -4,7 +4,7 @@ A single html file provides (nearly) the simplest possible client for https://gi
 ## How to use
 Fill in the values for the fields you would like to send with your request (only for POST requests), click the name of the request you would like to make, and the status code and server response will populate the bottom table.
 
-If a request is made the generates a JWT, the JWT will be stored in the `Authentication Token` portion of the third table. That JWT will be sent as part of all requests. That field can also be filled by hand (or more likely by copy paste)
+If a request is made that generates a JWT, the JWT will be stored in the `Authentication Token` portion of the third table. That JWT will be sent as part of all requests. That field can also be filled by hand (or more likely by copy paste)
 
 Really don't like downloading things? Try https://htmlpreview.github.io/?https://raw.githubusercontent.com/bsakai2000/ADCSimpleClient/master/simpleClient.html to get the most recent version in all its glory (or lack thereof)
 
