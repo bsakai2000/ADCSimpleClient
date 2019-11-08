@@ -127,7 +127,7 @@
 					<td><input id="door" placeholder="door"/></td>
 				</tr>
 				<tr>
-					<td><label for="Location">Location</label></td>
+					<td>Location</td>
 					<td><input id="Location" placeholder="Location"/></td>
 				</tr>
 				<tr>
@@ -146,7 +146,7 @@
 				<td onkeypress="postRequest('login', event)" onclick="postRequest('login')" class="apiCall" tabindex=0>login</td>
 			</tr>
 			<tr>
-				<td onkeypress="getRequest('inactive_user', event)" onclick="getRequest('inactive_user')" class="apiCall" tabindex=0>inactive_user</td>
+				<td onclick="getRequest('inactive_user')" class="apiCall" tabindex=2>inactive_user</td>
 				<td onkeypress="postRequest('admin/login', event)" onclick="postRequest('admin/login')" class="apiCall" tabindex=0>admin/login</td>
 			</tr>
 			<tr>
@@ -186,7 +186,7 @@
 		<table border='1' style="width:100%">
 			<tr>
 				<td style="width:10%"><b>HTTP Status Code</b></td>
-				<td><b><label for="response">Server Response</label></b></td>
+				<td><b>Server Response</b></td>
 				<td><b><label for="authentication">Authentication Token</label></b></td>
 			</tr>
 			<tr>
