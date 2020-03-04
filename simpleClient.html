@@ -4,8 +4,66 @@
 		<title>SimpleClient</title>
 		<script>
 			//Server we're making requests to
-			//var server = "http://192.168.56.107/api/";
-			var server = "https://rpiadc.com/api/";
+			var server = "http://192.168.56.101/api/";
+			//var server = "https://rpiadc.com/api/";
+
+			var inputs = ['rcsid', 'password', 'newpass', 'door', 'location', 'message'];
+			var gets = ['get_users', 'add_all', 'get_complaints', 'get_doors', 'renew_token', 'forgot_password'];
+			var posts = ['login', 'request_access', 'add_to_active', 'remove', 'submit_complaint', 'open_door', 'change_password', 'reset_password', 'forgot_password'];
+
+			function init()
+			{
+
+				for(var i = 0; i < inputs.length; ++i)
+				{
+					var row = document.createElement('tr');
+					var labelCell = document.createElement('td');
+					var label = document.createElement('label');
+					label.for = inputs[i];
+					label.innerHTML = inputs[i];
+					labelCell.appendChild(label);
+					row.appendChild(labelCell);
+					var inputCell = document.createElement('td');
+					var input = document.createElement('input');
+					input.id = inputs[i];
+					input.placeholder = inputs[i];
+					inputCell.appendChild(input);
+					row.appendChild(inputCell);
+					document.getElementById('inputs').appendChild(row);
+				}
+
+				var maxLength = gets.length;
+				if(posts.length > maxLength)
+				{
+					maxLength = posts.length;
+				}
+
+				for(var i = 0; i < maxLength; ++i)
+				{
+					var row = document.createElement('tr');
+					var getCell = document.createElement('td');
+					if(i < gets.length)
+					{
+						getCell.setAttribute('onkeypress', 'getRequest("' + gets[i] + '", event)');
+						getCell.setAttribute('onclick', 'getRequest("' + gets[i] + '")');
+						getCell.setAttribute('class', 'apiCall');
+						getCell.setAttribute('tabindex', 0);
+						getCell.innerHTML = gets[i];
+					}
+					row.appendChild(getCell);
+					var postCell = document.createElement('td');
+					if(i < posts.length)
+					{
+						postCell.setAttribute('onkeypress', 'postRequest("' + posts[i] + '", event)');
+						postCell.setAttribute('onclick', 'postRequest("' + posts[i] + '")');
+						postCell.setAttribute('class', 'apiCall');
+						postCell.setAttribute('tabindex', 0);
+						postCell.innerHTML = posts[i];
+					}
+					row.appendChild(postCell);
+					document.getElementById('apiCalls').appendChild(row);
+				}
+			}
 
 			//Make a POST request to the server
 			function postRequest(requestURI, ev)
@@ -24,7 +82,6 @@
 					if(requestURI.indexOf("login") != -1)
 					{
 						document.getElementById('authentication').value = JSON.parse(request.responseText).SESSIONID;
-						decodeToken();
 					}
 				}
 				//Generate the request
@@ -34,13 +91,10 @@
 				request.setRequestHeader("Authorization", "Bearer " + document.getElementById('authentication').value);
 				//Send all the values of the user input fields as a JSON object
 				var postData = {};
-				postData.RCSid = document.getElementById('RCSid').value;
-				postData.username = document.getElementById('username').value;
-				postData.password = document.getElementById('password').value;
-				postData.newPassword = document.getElementById('newPassword').value;
-				postData.door = document.getElementById('door').value;
-				postData.Location = document.getElementById('Location').value;
-				postData.Message = document.getElementById('Message').value;
+				for(var i = 0; i < inputs.length; ++i)
+				{
+					postData[inputs[i]] = document.getElementById(inputs[i]).value;
+				}
 				request.send(JSON.stringify(postData));
 			}
 
@@ -71,15 +125,6 @@
 				request.send();
 			}
 
-			function decodeToken()
-			{
-				let token = document.getElementById('authentication').value;
-				if(token == "")
-					return;
-				token = token.split('.');
-				let tokenDecoded = atob(token[0]) + " " + atob(token[1]);
-				document.getElementById("decodedToken").innerHTML = tokenDecoded;
-			}
 		</script>
 		<style>
 			textarea
@@ -93,7 +138,7 @@
 			}
 		</style>
 	</head>
-	<body>
+	<body onload='init();'>
 		<h1>Simple ADC Client</h1>
 		Almost the simplest ADC client possible<br>
 		For POST requests, fill the Fields in the first table with the Values you want to send, then click the name of the desired POST request in the second table<br>
@@ -102,84 +147,17 @@
 		If the request returns a SESSIONID, the SESSIONID returned by the server will appear in the third table<br>
 		All requests have the Authorization header set using the Authentication Token field from the third table<br><br>
 		<!-- This table stores the Fields we can send to the API, with inputs for users to fill in their own values -->
-		<table border='1'>
+		<table border='1' id='inputs'>
 			<tr>
 				<td><b>Field</b></td>
 				<td><b>Value</b></td>
-				<tr>
-					<td><label for="RCSid">RCSid</label></td>
-					<td><input id="RCSid" placeholder="RCSid"/></td>
-				</tr>
-				<tr>
-					<td><label for="username">username</label></td>
-					<td><input id="username" placeholder="username"/></td>
-				</tr>
-				<tr>
-					<td><label for="password">password</label></td>
-					<td><input id="password" placeholder="password"/></td>
-				</tr>
-				<tr>
-					<td><label for="newPassword">newPassword</label></td>
-					<td><input id="newPassword" placeholder="newPassword"/></td>
-				</tr>
-				<tr>
-					<td><label for="door">door</label></td>
-					<td><input id="door" placeholder="door"/></td>
-				</tr>
-				<tr>
-					<td><label for="Location">Location</label></td>
-					<td><input id="Location" placeholder="Location"/></td>
-				</tr>
-				<tr>
-					<td><label for="Message">Message</label></td>
-					<td><input id="Message" placeholder="Message"/></td>
-				</tr>
+			</tr>
 		</table><br>
 		<!-- This table stores clickable cells that make the requests, sorted by column depending on the type of request (GET or POST) -->
-		<table border='1'>
+		<table border='1' id='apiCalls'>
 			<tr>
 				<td><b>GET Requests</b></td>
 				<td><b>POST Requests</b></td>
-			</tr>
-			<tr>
-				<td onkeypress="getRequest('active_user', event)" onclick="getRequest('active_user')" class="apiCall" tabindex=0>active_user</td>
-				<td onkeypress="postRequest('login', event)" onclick="postRequest('login')" class="apiCall" tabindex=0>login</td>
-			</tr>
-			<tr>
-				<td onkeypress="getRequest('inactive_user', event)" onclick="getRequest('inactive_user')" class="apiCall" tabindex=0>inactive_user</td>
-				<td onkeypress="postRequest('admin/login', event)" onclick="postRequest('admin/login')" class="apiCall" tabindex=0>admin/login</td>
-			</tr>
-			<tr>
-				<td onkeypress="getRequest('addAll', event)" onclick="getRequest('addAll')" class="apiCall" tabindex=0>addAll</td>
-				<td onkeypress="postRequest('request-access', event)" onclick="postRequest('request-access')" class="apiCall" tabindex=0>request-access</td>
-			</tr>
-			<tr>
-				<td onkeypress="getRequest('get-complaints', event)" onclick="getRequest('get-complaints')" class="apiCall" tabindex=0>get-complaints</td>
-				<td onkeypress="postRequest('addtoActive', event)" onclick="postRequest('addtoActive')" class="apiCall" tabindex=0>addtoActive</td>
-			</tr>
-			<tr>
-				<td onkeypress="getRequest('get-doors', event)" onclick="getRequest('get-doors')" class="apiCall" tabindex=0>get-doors</td>
-				<td onkeypress="postRequest('remove', event)" onclick="postRequest('remove')" class="apiCall" tabindex=0>remove</td>
-			</tr>
-			<tr>
-				<td onkeypress="getRequest('renew-token', event)" onclick="getRequest('renew-token')" class="apiCall" tabindex=0>renew-token</td>
-				<td onkeypress="postRequest('submit-complaint', event)" onclick="postRequest('submit-complaint')" class="apiCall" tabindex=0>submit-complaint</td>
-			</tr>
-			<tr>
-				<td></td>
-				<td onkeypress="postRequest('open-door', event)" onclick="postRequest('open-door')" class="apiCall" tabindex=0>open-door</td>
-			</tr>
-			<tr>
-				<td></td>
-				<td onkeypress="postRequest('change-password', event)" onclick="postRequest('change-password')" class="apiCall" tabindex=0>change-password</td>
-			</tr>
-			<tr>
-				<td></td>
-				<td onkeypress="postRequest('admin/change-password', event)" onclick="postRequest('admin/change-password')" class="apiCall" tabindex=0>admin/change-password</td>
-			</tr>
-			<tr>
-				<td></td>
-				<td onkeypress="postRequest('reset-password', event)" onclick="postRequest('reset-password')" class="apiCall" tabindex=0>reset-password</td>
 			</tr>
 		</table><br>
 		<!-- This table stores information about the request, as well as the JWT authentication token currently in use -->
@@ -195,6 +173,5 @@
 				<td><textarea id="authentication"></textarea></td>
 			</tr>
 		</table>
-		Decoded token: <span id="decodedToken"></span>
 	</body>
 </html>
